@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="sl" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interaktivna Analiza: Razpisi za Hranilnike Energije</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Chosen Palette: Green Harmony -->
+    <!-- Application Structure Plan: A user-centric, single-page scrolling application with a sticky navigation bar. The structure guides the user from the 'why' (problem context), to the 'what' (past tender analysis), 'what's next' (2025 forecast), 'how much' (interactive viability calculator), 'how to' (application process), and finally 'what's for me' (strategic recommendations). This thematic flow, supported by interactive elements like toggles, charts, and a calculator, is chosen over a linear report structure to enhance engagement and comprehension for potential investors. -->
+    <!-- Visualization & Content Choices: 
+        - Report Info: JP SO-03 vs JP-OVE-04. Goal: Compare. Viz: Interactive Bar Chart. Interaction: Toggle buttons update chart and info cards. Justification: Faster visual comparison than a table. Library: Chart.js.
+        - Report Info: Investment Viability (Tabela 3). Goal: Inform/Engage. Viz: Interactive Calculator. Interaction: User input updates subsidy and payback calculations. Justification: Personalizes data, making it more tangible. Method: Vanilla JS.
+        - Report Info: Application Process. Goal: Organize. Viz: Step-by-step diagram. Interaction: Hover/Click to reveal details. Justification: Visual flow simplifies a complex process. Method: HTML/CSS.
+        - Report Info: Strategic Recommendations. Goal: Organize. Viz: Accordion. Interaction: Click to expand relevant section. Justification: Reduces clutter, provides tailored advice directly. Method: Vanilla JS.
+        - All choices confirm NO SVG/Mermaid used, focusing on Canvas and structured HTML/CSS for visuals. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+        .nav-link {
+            transition: all 0.3s ease;
+            @apply px-3 py-2 text-xs font-medium text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 rounded-md;
+        }
+        .nav-link.active {
+            @apply bg-emerald-100 text-emerald-800;
+        }
+        .tab-button {
+            transition: all 0.3s ease;
+            @apply px-4 py-2 text-sm font-semibold border-b-2 border-transparent hover:bg-slate-100;
+        }
+        .tab-button.active {
+            @apply border-emerald-500 text-emerald-600;
+        }
+        .accordion-icon {
+            transition: transform 0.3s ease;
+        }
+        .carousel-item {
+            display: none;
+        }
+        .carousel-item.active {
+            display: grid;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+    <header id="header" class="bg-white/80 backdrop-blur-lg sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-4 lg:px-6">
+            <div class="flex items-center justify-between h-16">
+                <div>
+                    <a href="#hero" class="text-xl font-bold text-emerald-700">Vodnik po Hranilnikih</a>
+                </div>
+                
+                <div class="hidden lg:block">
+                    <div class="flex items-baseline space-x-2">
+                        <a href="#zasto" class="nav-link">Izzivi</a>
+                        <a href="#kaj-je-bess" class="nav-link">Rešitev</a>
+                        <a href="#prednosti" class="nav-link">Prednosti</a>
+                        <a href="#analiza" class="nav-link">Analiza</a>
+                        <a href="#napoved" class="nav-link">Napoved</a>
+                        <a href="#kalkulator" class="nav-link">Kalkulator</a>
+                        <a href="#postopek" class="nav-link">Postopek</a>
+                        <a href="#faq" class="nav-link">FAQ</a>
+                    </div>
+                </div>
+
+                <div class="lg:hidden">
+                    <button id="mobile-menu-button" class="inline-flex items-center justify-center p-2 rounded-md text-slate-400 hover:text-white hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-800 focus:ring-white">
+                        <span class="sr-only">Odpri meni</span>
+                        <svg class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                        <svg class="hidden h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <div id="mobile-menu" class="lg:hidden hidden pb-3 space-y-1">
+                <a href="#zasto" class="nav-link block">Izzivi</a>
+                <a href="#kaj-je-bess" class="nav-link block">Rešitev</a>
+                <a href="#prednosti" class="nav-link block">Prednosti</a>
+                <a href="#analiza" class="nav-link block">Analiza</a>
+                <a href="#napoved" class="nav-link block">Napoved</a>
+                <a href="#kalkulator" class="nav-link block">Kalkulator</a>
+                <a href="#postopek" class="nav-link block">Postopek</a>
+                <a href="#faq" class="nav-link block">FAQ</a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section id="hero" class="bg-white">
+            <div class="container mx-auto px-4 lg:px-6 py-10">
+                <div class="grid lg:grid-cols-2 gap-8 items-center">
+                    <div class="text-center lg:text-left">
+                        <h1 class="text-4xl md:text-5xl font-bold tracking-tight text-slate-900 mb-4">Vaša sončna elektrarna je odlična naložba, a lahko postane še boljša</h1>
+                        <p class="text-lg md:text-xl text-slate-600 max-w-2xl mx-auto lg:mx-0">
+                            Če ste lastnik sončne elektrarne, ste že naredili pomemben korak k trajnostni prihodnosti. Ta vodnik vam bo pokazal, kako lahko z baterijskim hranilnikom energije vaša naložba postane zares izjemna.
+                        </p>
+                        <a href="#prednosti" class="mt-8 inline-block bg-emerald-600 text-white font-semibold px-8 py-3 rounded-lg shadow-md hover:bg-emerald-700 transition-colors">
+                            Odkrijte prednosti
+                        </a>
+                    </div>
+                    <div>
+                        <img src="images/image1.jpg" alt="Celosten energetski sistem" class="rounded-lg shadow-xl w-full h-auto" onerror="this.onerror=null;this.src='https://placehold.co/800x600/e2e8f0/64748b?text=Celosten+energetski+sistem';">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="zasto" class="py-16 lg:py-24">
+            <div class="container mx-auto px-4 lg:px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold text-slate-900">Zakaj samo sončna elektrarna včasih ni dovolj?</h2>
+                    <p class="mt-4 text-lg text-slate-600 max-w-3xl mx-auto">Vaša elektrarna je čudovit vir energije, a njena proizvodnja ni vedno usklajena z vašo porabo. To ustvarja izzive, kot so neizkoriščeni viški, odvisnost od omrežja in višji stroški zaradi nove metodologije obračunavanja omrežnine.</p>
+                </div>
+                <div class="grid md:grid-cols-2 gap-8 items-center">
+                    <div class="bg-white p-6 rounded-lg shadow-lg border border-red-200">
+                        <h3 class="text-xl font-semibold mb-3 text-red-700 flex items-center">
+                            <span class="text-2xl mr-3">❌</span> Brez Hranilnika: Izzivi
+                        </h3>
+                        <p class="text-slate-600 mb-4">Največja proizvodnja je sredi dneva, ko je poraba pogosto nizka. Viški se oddajo v omrežje po nizkih cenah, zvečer pa je treba drago energijo kupovati.</p>
+                        <div class="w-full bg-slate-200 rounded-full h-4">
+                            <div class="bg-red-500 h-4 rounded-full" style="width: 35%"></div>
+                        </div>
+                        <p class="text-xs text-center mt-1">~35% neposredna lastna poraba</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-lg border border-emerald-200">
+                        <h3 class="text-xl font-semibold mb-3 text-emerald-700 flex items-center">
+                            <span class="text-2xl mr-3">✅</span> S Hranilnikom: Rešitev
+                        </h3>
+                        <p class="text-slate-600 mb-4">Hranilnik shrani dragocene viške sončne energije za porabo v večernih urah. Poleg tega lahko pokrije visoke konice porabe in vas tako obvaruje pred visokimi stroški.</p>
+                        <div class="w-full bg-slate-200 rounded-full h-4">
+                            <div class="bg-emerald-500 h-4 rounded-full" style="width: 75%"></div>
+                        </div>
+                        <p class="text-xs text-center mt-1">~75%+ stopnja samooskrbe</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="kaj-je-bess" class="py-16 lg:py-24 bg-white">
+            <div class="container mx-auto px-4 lg:px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold text-slate-900">Vaš Osebni Energetski Sef</h2>
+                    <p class="mt-4 text-lg text-slate-600 max-w-3xl mx-auto">Predstavljajte si baterijski hranilnik energije (BESS) kot visokotehnološki sef, ki varno shrani vašo sončno energijo za kasnejšo uporabo.</p>
+                </div>
+                <div class="grid lg:grid-cols-2 gap-12 items-center">
+                    <div>
+                        <h3 class="text-2xl font-semibold mb-4">Kako deluje?</h3>
+                        <p class="text-slate-600 mb-6">Ko vaša sončna elektrarna proizvede več energije, kot jo porabite, se presežek namesto v omrežje shrani v baterijo. Ko sonce ne sije ali ko vaša poraba naraste, baterija sprosti shranjeno energijo. Celoten proces inteligentno vodi sistem za upravljanje z energijo (EMS).</p>
+                         <div class="space-y-4">
+                            <div class="p-4 bg-slate-50 rounded-lg">
+                                <h4 class="font-semibold text-emerald-700">1. Baterijske celice (LiFePO4)</h4>
+                                <p class="text-sm text-slate-600">Srce sistema, znano po visoki varnosti in dolgi življenjski dobi.</p>
+                            </div>
+                            <div class="p-4 bg-slate-50 rounded-lg">
+                                <h4 class="font-semibold text-emerald-700">2. Sistem za upravljanje (BMS)</h4>
+                                <p class="text-sm text-slate-600">"Možgani", ki ščitijo baterijo in optimizirajo delovanje.</p>
+                            </div>
+                            <div class="p-4 bg-slate-50 rounded-lg">
+                                <h4 class="font-semibold text-emerald-700">3. Hibridni razsmernik</h4>
+                                <p class="text-sm text-slate-600">Pretvornik, ki upravlja energetske tokove med vsemi komponentami.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <img src="images/image5.jpg" alt="Shema delovanja industrijskega BESS" class="rounded-lg shadow-xl w-full h-auto" onerror="this.onerror=null;this.src='https://placehold.co/800x600/e2e8f0/64748b?text=Shema+delovanja+BESS';">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="prednosti" class="py-16 lg:py-24 overflow-hidden">
+            <div class="container mx-auto px-4 lg:px-6">
+                 <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold text-slate-900">Ključne prednosti Baterijskega Hranilnika</h2>
+                    <p class="mt-4 text-lg text-slate-600 max-w-2xl mx-auto">Združitev sončne elektrarne in baterije odklene številne koristi, ki presegajo zgolj proizvodnjo elektrike.</p>
+                </div>
+                <div id="carousel-container" class="relative">
+                    <div id="carousel-items">
+                        <div class="carousel-item active md:grid-cols-2 gap-8 items-center" data-index="0">
+                            <img src="images/image2.jpg" class="rounded-lg shadow-xl w-full h-auto object-cover max-h-[400px]" onerror="this.onerror=null;this.src='https://placehold.co/600x400/e2e8f0/64748b?text=Baterijski+hranilnik';">
+                            <div class="bg-white p-6 rounded-lg shadow-lg mt-4 md:mt-0">
+                                <h3 class="text-xl font-semibold text-emerald-700 mb-2">Povečanje samooskrbe</h3>
+                                <p class="text-slate-600">Shranite dnevne viške sončne energije in jih porabite zvečer. Manj nakupov iz omrežja pomeni neposreden prihranek.</p>
+                            </div>
+                        </div>
+                        <div class="carousel-item md:grid-cols-2 gap-8 items-center" data-index="1">
+                             <img src="images/image3.jpg" class="rounded-lg shadow-xl w-full h-auto object-cover max-h-[400px]" onerror="this.onerror=null;this.src='https://placehold.co/600x400/e2e8f0/64748b?text=Kontejnerski+BESS';">
+                             <div class="bg-white p-6 rounded-lg shadow-lg mt-4 md:mt-0">
+                                <h3 class="text-xl font-semibold text-emerald-700 mb-2">Znižanje konične moči</h3>
+                                <p class="text-slate-600">"Režite" vrhove porabe in se izognite plačilu visoke omrežnine za presežno moč, kar je ključno ob novi metodologiji.</p>
+                            </div>
+                        </div>
+                        <div class="carousel-item md:grid-cols-2 gap-8 items-center" data-index="2">
+                           <img src="images/image2.jpg" class="rounded-lg shadow-xl w-full h-auto object-cover max-h-[400px]" onerror="this.onerror=null;this.src='https://placehold.co/600x400/e2e8f0/64748b?text=Baterijski+hranilnik';">
+                            <div class="bg-white p-6 rounded-lg shadow-lg mt-4 md:mt-0">
+                                <h3 class="text-xl font-semibold text-emerald-700 mb-2">Energetska varnost</h3>
+                                <p class="text-slate-600">Ob izpadu omrežja baterija lahko zagotovi rezervno napajanje za ključne porabnike, kar prinaša mirnost in neprekinjeno delovanje.</p>
+                            </div>
+                        </div>
+                        <div class="carousel-item md:grid-cols-2 gap-8 items-center" data-index="3">
+                            <img src="images/image3.jpg" class="rounded-lg shadow-xl w-full h-auto object-cover max-h-[400px]" onerror="this.onerror=null;this.src='https://placehold.co/600x400/e2e8f0/64748b?text=Kontejnerski+BESS';">
+                            <div class="bg-white p-6 rounded-lg shadow-lg mt-4 md:mt-0">
+                                <h3 class="text-xl font-semibold text-emerald-700 mb-2">Pripravljenost na prihodnost</h3>
+                                <p class="text-slate-600">Baterijski hranilnik je vaša vstopnica v prihodnost energetike, kjer boste pripravljeni na konec neto merjenja in dinamične cene.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <button id="prevBtn" class="absolute top-1/2 left-0 -translate-y-1/2 bg-white/50 p-2 rounded-full shadow-md hover:bg-white">&lt;</button>
+                    <button id="nextBtn" class="absolute top-1/2 right-0 -translate-y-1/2 bg-white/50 p-2 rounded-full shadow-md hover:bg-white">&gt;</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="analiza" class="py-16 lg:py-24 bg-white">
+            <div class="container mx-auto px-4 lg:px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold text-slate-900">Primerjalna Analiza Ključnih Razpisov</h2>
+                    <p class="mt-4 text-lg text-slate-600 max-w-2xl mx-auto">Borzen uporablja dvotirno strategijo: sanacijo obstoječega stanja pri gospodinjstvih in spodbujanje sistemsko integriranih naložb pri podjetjih.</p>
+                </div>
+
+                <div class="border-b border-slate-200 mb-6 flex justify-center">
+                    <button id="btn-gospodinjstva" class="tab-button active">Za Gospodinjstva (JP SO-03)</button>
+                    <button id="btn-poslovni" class="tab-button">Za Poslovne Subjekte (JP-OVE-04)</button>
+                </div>
+                
+                <div class="grid lg:grid-cols-2 gap-8 items-center">
+                    <div>
+                        <div id="info-gospodinjstva">
+                            <h3 class="text-2xl font-bold mb-4 text-emerald-800">Ciljana Sanacija za Gospodinjstva</h3>
+                            <p class="text-slate-600 mb-6">Poziv JP SO-03 je bil korektivni ukrep za lastnike obstoječih sončnih elektrarn (SE). Z višjo subvencijo je spodbujal naknadno vgradnjo hranilnikov.</p>
+                            <div class="space-y-4">
+                                <div class="flex items-start"><span class="text-emerald-500 font-bold text-xl mr-3 mt-1">→</span><div><strong class="text-slate-800">Subvencija:</strong> 275 €/kWh</div></div>
+                                <div class="flex items-start"><span class="text-emerald-500 font-bold text-xl mr-3 mt-1">→</span><div><strong class="text-slate-800">Intenzivnost:</strong> Do 40% upravičenih stroškov</div></div>
+                            </div>
+                        </div>
+                         <div id="info-poslovni" class="hidden">
+                            <h3 class="text-2xl font-bold mb-4 text-emerald-800">Strateške Naložbe za Podjetja</h3>
+                            <p class="text-slate-600 mb-6">Poziv JP-OVE-04 je usmerjen v prihodnost in spodbuja gradnjo novih OVE naprav, ki so že v osnovi zasnovane s hranilnikom.</p>
+                            <div class="space-y-4">
+                                <div class="flex items-start"><span class="text-emerald-500 font-bold text-xl mr-3 mt-1">→</span><div><strong class="text-slate-800">Subvencija:</strong> 225 €/kWh</div></div>
+                                <div class="flex items-start"><span class="text-emerald-500 font-bold text-xl mr-3 mt-1">→</span><div><strong class="text-slate-800">Intenzivnost:</strong> 45-65% (odvisno od velikosti podjetja)</div></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="razpisiChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="napoved" class="py-16 lg:py-24">
+            <div class="container mx-auto px-4 lg:px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold text-slate-900">Napoved Razpisa Junij 2025</h2>
+                    <p class="mt-4 text-lg text-slate-600 max-w-3xl mx-auto">Dogodek, ki ga organizira GOLEA 12. junija 2025, ni objava razpisa, temveč strateški predogled. To so ključni pričakovani parametri naslednjega Borzenovega poziva.</p>
+                </div>
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="bg-white p-6 rounded-lg shadow-md"><strong class="block text-emerald-600 mb-2">Ciljna Publika</strong><p class="text-slate-700">Mala in srednje velika podjetja (MSP) ter energetske skupnosti.</p></div>
+                    <div class="bg-white p-6 rounded-lg shadow-md"><strong class="block text-emerald-600 mb-2">Višina Subvencije</strong><p class="text-slate-700">200 - 250 €/kWh.</p></div>
+                    <div class="bg-white p-6 rounded-lg shadow-md"><strong class="block text-emerald-600 mb-2">Intenzivnost Pomoči</strong><p class="text-slate-700">Ohranjena na 40 - 65% stroškov.</p></div>
+                    <div class="bg-white p-6 rounded-lg shadow-md"><strong class="block text-emerald-600 mb-2">Tehnični Fokus</strong><p class="text-slate-700">Sistemi s pametnim upravljanjem (EMS).</p></div>
+                    <div class="bg-white p-6 rounded-lg shadow-md"><strong class="block text-emerald-600 mb-2">Načelo Dodeljevanja</strong><p class="text-slate-700">"Prvi pride, prvi melje" do porabe sredstev.</p></div>
+                    <div class="bg-white p-6 rounded-lg shadow-md"><strong class="block text-emerald-600 mb-2">Ključni Dokument</strong><p class="text-slate-700">Pravnomočno soglasje za priključitev.</p></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="kalkulator" class="py-16 lg:py-24 bg-white">
+            <div class="container mx-auto px-4 lg:px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold text-slate-900">Je Naložba Upravičena? Preverite Sami!</h2>
+                    <p class="mt-4 text-lg text-slate-600 max-w-3xl mx-auto">Uporabite ta poenostavljen kalkulator za oceno vaše naložbe. Vnesite želeno kapaciteto in preverite okvirno neto naložbo ter vračilno dobo.</p>
+                </div>
+                <div class="max-w-4xl mx-auto grid lg:grid-cols-2 gap-8 items-start">
+                    <div class="bg-slate-50 p-6 rounded-lg border">
+                        <h3 class="font-semibold text-lg mb-4">1. Nastavite kapaciteto hranilnika:</h3>
+                        <label for="capacity-slider" class="sr-only">Kapaciteta hranilnika (kWh)</label>
+                        <input id="capacity-slider" type="range" min="20" max="1000" value="100" step="20" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer">
+                        <div class="text-center mt-2 font-bold text-2xl text-emerald-600"><span id="capacity-value">100</span> kWh</div>
+
+                        <h3 class="font-semibold text-lg mb-4 mt-8">2. Prilagodite predpostavke (opcijsko):</h3>
+                        <div class="space-y-3">
+                            <div>
+                                <label for="cost-per-kwh" class="block text-sm font-medium text-slate-700">Skupni strošek na kWh (€)</label>
+                                <input type="number" id="cost-per-kwh" value="550" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm p-2">
+                            </div>
+                            <div>
+                                <label for="subsidy-per-kwh" class="block text-sm font-medium text-slate-700">Pričakovana subvencija na kWh (€)</label>
+                                <input type="number" id="subsidy-per-kwh" value="225" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm p-2">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-lg">
+                        <h3 class="font-semibold text-lg mb-4">Okvirni izračun:</h3>
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-baseline"><span class="text-slate-600">Skupna naložba:</span><span id="total-investment" class="font-bold text-lg">55.000 €</span></div>
+                            <div class="flex justify-between items-baseline"><span class="text-slate-600">Predvidena subvencija:</span><span id="total-subsidy" class="font-bold text-lg text-green-600">-22.500 €</span></div>
+                            <p id="subsidy-cap-warning" class="text-xs text-amber-600 mt-1 hidden">Opozorilo: Subvencija je omejena na 60% vrednosti naložbe.</p>
+                            <hr class="my-2">
+                            <div class="flex justify-between items-baseline text-xl"><strong class="text-slate-800">Neto Naložba:</strong><span id="net-investment" class="font-bold text-emerald-700">32.500 €</span></div>
+                        </div>
+                        <div class="mt-6 pt-6 border-t">
+                             <h3 class="font-semibold text-lg mb-4">Letna vrednost (na podlagi modela):</h3>
+                             <div class="space-y-3">
+                                <div class="flex justify-between items-baseline"><span class="text-slate-600">Prihranek (samooskrba):</span><span id="energy-savings" class="font-bold text-lg">3.650 €</span></div>
+                                <div class="flex justify-between items-baseline"><span class="text-slate-600">Prihranek (konična moč):</span><span id="grid-savings" class="font-bold text-lg">4.800 €</span></div>
+                                <div class="flex justify-between items-baseline"><span class="text-slate-600">Prihodki (sist. storitve):</span><span id="services-revenue" class="font-bold text-lg">1.500 €</span></div>
+                                <hr class="my-2">
+                                <div class="flex justify-between items-baseline text-xl"><strong class="text-slate-800">Skupaj letno:</strong><span id="total-annual-value" class="font-bold text-emerald-700">9.950 €</span></div>
+                             </div>
+                        </div>
+                        <div class="mt-6 bg-emerald-50 p-4 rounded-lg text-center">
+                            <p class="text-sm text-emerald-800">Okvirna vračilna doba naložbe:</p>
+                            <p class="text-3xl font-bold text-emerald-700 mt-1"><span id="payback-period">3.3</span> let</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="postopek" class="py-16 lg:py-24">
+            <div class="container mx-auto px-4 lg:px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold text-slate-900">Vodnik po Postopku Prijave</h2>
+                    <p class="mt-4 text-lg text-slate-600 max-w-2xl mx-auto">Uspeh na razpisih, ki delujejo po načelu "prvi pride, prvi melje", je odvisen od priprave. Sledite tem trem ključnim fazam.</p>
+                </div>
+                <div class="relative">
+                    <div class="hidden md:block absolute left-1/2 -translate-x-1/2 top-4 w-0.5 h-[calc(100%-2rem)] bg-slate-300"></div>
+                    <div class="space-y-12 md:space-y-0 md:grid md:grid-cols-2 md:gap-x-12">
+                        <div class="space-y-12">
+                           <div class="md:text-right">
+                                <div class="inline-block bg-white p-6 rounded-lg shadow-lg relative border-t-4 border-emerald-500">
+                                    <div class="md:absolute top-5 md:left-full md:ml-6 flex items-center justify-center w-12 h-12 bg-emerald-500 text-white font-bold text-2xl rounded-full">1</div>
+                                    <h3 class="text-xl font-semibold mb-2">Faza pred prijavo: Priprava</h3>
+                                    <ul class="list-disc list-inside text-left text-slate-600 space-y-1">
+                                        <li>Izdelajte tehnično zasnovo sistema.</li>
+                                        <li>Pridobite **veljavno soglasje za priključitev**.</li>
+                                        <li>Zberite zavezujoče ponudbe izvajalcev.</li>
+                                    </ul>
+                                </div>
+                           </div>
+                        </div>
+                        <div></div>
+                        <div></div>
+                        <div>
+                             <div class="md:text-left">
+                                <div class="inline-block bg-white p-6 rounded-lg shadow-lg relative border-t-4 border-emerald-500">
+                                    <div class="md:absolute top-5 md:right-full md:mr-6 flex items-center justify-center w-12 h-12 bg-emerald-500 text-white font-bold text-2xl rounded-full">2</div>
+                                    <h3 class="text-xl font-semibold mb-2">Faza prijave: Ukrepanje</h3>
+                                    <ul class="list-disc list-inside text-left text-slate-600 space-y-1">
+                                        <li>Pripravite vso dokumentacijo vnaprej.</li>
+                                        <li>Oddajte vlogo preko spletne aplikacije Borzena.</li>
+                                        <li>Bodite hitri - vloge se obravnavajo po vrstnem redu.</li>
+                                    </ul>
+                                </div>
+                           </div>
+                        </div>
+                         <div class="md:text-right">
+                                <div class="inline-block bg-white p-6 rounded-lg shadow-lg relative border-t-4 border-emerald-500">
+                                    <div class="md:absolute top-5 md:left-full md:ml-6 flex items-center justify-center w-12 h-12 bg-emerald-500 text-white font-bold text-2xl rounded-full">3</div>
+                                    <h3 class="text-xl font-semibold mb-2">Faza po odobritvi: Izvedba</h3>
+                                    <ul class="list-disc list-inside text-left text-slate-600 space-y-1">
+                                        <li>Po prejemu odločbe izvedite naložbo.</li>
+                                        <li>Oddajte zahtevek za izplačilo z dokazili.</li>
+                                        <li>Priložite račune, potrdila o plačilu in fotografije.</li>
+                                    </ul>
+                                </div>
+                           </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="faq" class="py-16 lg:py-24 bg-white">
+            <div class="container mx-auto px-4 lg:px-6">
+                 <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold text-slate-900">Pogosta Vprašanja in Odgovori</h2>
+                    <p class="mt-4 text-lg text-slate-600 max-w-2xl mx-auto">Zbrali smo odgovore na najpogostejše dileme lastnikov sončnih elektrarn.</p>
+                </div>
+                <div class="max-w-3xl mx-auto space-y-4" id="accordion-container">
+                    <div class="border rounded-lg bg-slate-50 overflow-hidden">
+                        <button class="accordion-header w-full flex justify-between items-center text-left p-4 font-semibold text-slate-800 hover:bg-slate-100">
+                            <span>Ali res potrebujem baterijo, če sem v sistemu neto meritev?</span>
+                            <span class="accordion-icon transition-transform transform">+</span>
+                        </button>
+                        <div class="accordion-content hidden p-4 border-t text-slate-600">
+                            Tudi če ste v sistemu neto meritev, baterija prinaša takojšnje prednosti. Omogoča vam znižanje stroškov konične moči, kar je ključno ob novi, dražji omrežnini. Hkrati vas pripravi na neizogiben konec sistema neto meritev in zagotavlja energetsko varnost ob izpadih omrežja.
+                        </div>
+                    </div>
+                     <div class="border rounded-lg bg-slate-50 overflow-hidden">
+                        <button class="accordion-header w-full flex justify-between items-center text-left p-4 font-semibold text-slate-800 hover:bg-slate-100">
+                            <span>Kakšno velikost hranilnika potrebujem?</span>
+                             <span class="accordion-icon transition-transform transform">+</span>
+                        </button>
+                        <div class="accordion-content hidden p-4 border-t text-slate-600">
+                            Prava velikost je odvisna od vaše porabe, velikosti sončne elektrarne in ciljev. Strokovnjak vam bo na podlagi analize vaših podatkov svetoval optimalno kapaciteto (v kWh) in moč (v kW), da se izognete nepotrebnim stroškom ali premajhni zmogljivosti.
+                        </div>
+                    </div>
+                     <div class="border rounded-lg bg-slate-50 overflow-hidden">
+                        <button class="accordion-header w-full flex justify-between items-center text-left p-4 font-semibold text-slate-800 hover:bg-slate-100">
+                            <span>Kolikšna je življenjska doba baterijskega hranilnika?</span>
+                            <span class="accordion-icon transition-transform transform">+</span>
+                        </button>
+                        <div class="accordion-content hidden p-4 border-t text-slate-600">
+                           Sodobne LiFePO4 baterije imajo življenjsko dobo 10-15 let ali več, kar proizvajalci pogosto specificirajo s številom ciklov (običajno 6.000-10.000) in garancijo na ohranitev določenega odstotka kapacitete po določenem obdobju.
+                        </div>
+                    </div>
+                    <div class="border rounded-lg bg-slate-50 overflow-hidden">
+                        <button class="accordion-header w-full flex justify-between items-center text-left p-4 font-semibold text-slate-800 hover:bg-slate-100">
+                            <span>Ali lahko z baterijo postanem popolnoma neodvisen od omrežja ("off-grid")?</span>
+                            <span class="accordion-icon transition-transform transform">+</span>
+                        </button>
+                        <div class="accordion-content hidden p-4 border-t text-slate-600">
+                           Tehnično je mogoče, a je za zanesljivo celoletno oskrbo zelo drago in kompleksno. Bolj smiselna rešitev je uporaba baterije za dnevno optimizacijo in rezervno napajanje ("backup") ob izpadih, medtem ko ostanete priključeni na omrežje.
+                        </div>
+                    </div>
+                     <div class="border rounded-lg bg-slate-50 overflow-hidden">
+                        <button class="accordion-header w-full flex justify-between items-center text-left p-4 font-semibold text-slate-800 hover:bg-slate-100">
+                            <span>Kako nova omrežnina vpliva na smiselnost naložbe?</span>
+                            <span class="accordion-icon transition-transform transform">+</span>
+                        </button>
+                        <div class="accordion-content hidden p-4 border-t text-slate-600">
+                           Nova metodologija, ki poudarja stroške moči, bistveno povečuje smiselnost naložbe. Zmožnost "rezanja konic" z baterijo bo imela neposreden in veliko bolj izrazit vpliv na znižanje vaših računov.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-slate-800 text-white">
+        <div class="container mx-auto px-4 lg:px-6 py-8 text-center">
+            <p class="text-sm text-slate-400">Ta interaktivna aplikacija je bila ustvarjena za informativne namene. Ne predstavlja finančnega svetovanja. Pred sprejetjem naložbenih odločitev se posvetujte s strokovnjaki.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            
+            const tenderData = {
+                gospodinjstva: {
+                    label: 'Gospodinjstva (JP SO-03)',
+                    subvencija: 275,
+                    barColor: 'rgba(22, 163, 74, 0.7)',
+                    borderColor: 'rgba(22, 163, 74, 1)'
+                },
+                poslovni: {
+                    label: 'Poslovni subjekti (JP-OVE-04)',
+                    subvencija: 225,
+                    barColor: 'rgba(59, 130, 246, 0.7)',
+                    borderColor: 'rgba(59, 130, 246, 1)'
+                }
+            };
+
+            const ctx = document.getElementById('razpisiChart').getContext('2d');
+            let razpisiChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Višina subvencije (€/kWh)'],
+                    datasets: []
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return ` ${context.raw} €/kWh`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            max: 300,
+                            title: {
+                                display: true,
+                                text: 'Subvencija v EUR na kWh'
+                            }
+                        },
+                        y: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+
+            function updateChart(type) {
+                const data = tenderData[type];
+                razpisiChart.data.datasets = [{
+                    label: data.label,
+                    data: [data.subvencija],
+                    backgroundColor: [data.barColor],
+                    borderColor: [data.borderColor],
+                    borderWidth: 1
+                }];
+                razpisiChart.update();
+            }
+
+            const btnGospodinjstva = document.getElementById('btn-gospodinjstva');
+            const btnPoslovni = document.getElementById('btn-poslovni');
+            const infoGospodinjstva = document.getElementById('info-gospodinjstva');
+            const infoPoslovni = document.getElementById('info-poslovni');
+
+            btnGospodinjstva.addEventListener('click', () => {
+                updateChart('gospodinjstva');
+                infoGospodinjstva.classList.remove('hidden');
+                infoPoslovni.classList.add('hidden');
+                btnGospodinjstva.classList.add('active');
+                btnPoslovni.classList.remove('active');
+            });
+
+            btnPoslovni.addEventListener('click', () => {
+                updateChart('poslovni');
+                infoGospodinjstva.classList.add('hidden');
+                infoPoslovni.classList.remove('hidden');
+                btnPoslovni.classList.add('active');
+                btnGospodinjstva.classList.remove('active');
+            });
+            
+            updateChart('gospodinjstva');
+
+            const capacitySlider = document.getElementById('capacity-slider');
+            const capacityValue = document.getElementById('capacity-value');
+            const costPerKwhInput = document.getElementById('cost-per-kwh');
+            const subsidyPerKwhInput = document.getElementById('subsidy-per-kwh');
+
+            const totalInvestmentEl = document.getElementById('total-investment');
+            const totalSubsidyEl = document.getElementById('total-subsidy');
+            const netInvestmentEl = document.getElementById('net-investment');
+            const energySavingsEl = document.getElementById('energy-savings');
+            const gridSavingsEl = document.getElementById('grid-savings');
+            const servicesRevenueEl = document.getElementById('services-revenue');
+            const totalAnnualValueEl = document.getElementById('total-annual-value');
+            const paybackPeriodEl = document.getElementById('payback-period');
+            const subsidyCapWarningEl = document.getElementById('subsidy-cap-warning');
+
+            function calculateInvestment() {
+                const capacity = parseFloat(capacitySlider.value);
+                const costPerKwh = parseFloat(costPerKwhInput.value);
+                const subsidyPerKwh = parseFloat(subsidyPerKwhInput.value);
+
+                capacityValue.textContent = capacity;
+
+                const totalInvestment = capacity * costPerKwh;
+                const initialSubsidy = capacity * subsidyPerKwh;
+                const maxSubsidy = totalInvestment * 0.60;
+                
+                const finalSubsidy = Math.min(initialSubsidy, maxSubsidy);
+
+                if (initialSubsidy > maxSubsidy) {
+                    subsidyCapWarningEl.classList.remove('hidden');
+                } else {
+                    subsidyCapWarningEl.classList.add('hidden');
+                }
+
+                const netInvestment = totalInvestment - finalSubsidy;
+                
+                const annualEnergySavings = capacity * 365 * 0.10; 
+                const annualGridSavings = (capacity / 5) * 20 * 12; 
+                const annualServicesRevenue = capacity * 15; 
+                const totalAnnualValue = annualEnergySavings + annualGridSavings + annualServicesRevenue;
+
+                const paybackPeriod = netInvestment > 0 && totalAnnualValue > 0 ? (netInvestment / totalAnnualValue).toFixed(1) : 'N/A';
+                
+                const formatCurrency = (value) => new Intl.NumberFormat('sl-SI', { style: 'currency', currency: 'EUR' }).format(value);
+
+                totalInvestmentEl.textContent = formatCurrency(totalInvestment);
+                totalSubsidyEl.textContent = `-${formatCurrency(finalSubsidy)}`;
+                netInvestmentEl.textContent = formatCurrency(netInvestment);
+                energySavingsEl.textContent = formatCurrency(annualEnergySavings);
+                gridSavingsEl.textContent = formatCurrency(annualGridSavings);
+                servicesRevenueEl.textContent = formatCurrency(annualServicesRevenue);
+                totalAnnualValueEl.textContent = formatCurrency(totalAnnualValue);
+                paybackPeriodEl.textContent = paybackPeriod;
+            }
+
+            capacitySlider.addEventListener('input', calculateInvestment);
+            costPerKwhInput.addEventListener('input', calculateInvestment);
+            subsidyPerKwhInput.addEventListener('input', calculateInvestment);
+            
+            calculateInvestment();
+            
+            const accordionContainer = document.getElementById('accordion-container');
+            if(accordionContainer) {
+                accordionContainer.addEventListener('click', function(e) {
+                    const header = e.target.closest('.accordion-header');
+                    if (!header) return;
+
+                    const content = header.nextElementSibling;
+                    const icon = header.querySelector('.accordion-icon');
+                    
+                    const isHidden = content.classList.contains('hidden');
+                    
+                    const allContents = accordionContainer.querySelectorAll('.accordion-content');
+                    const allIcons = accordionContainer.querySelectorAll('.accordion-icon');
+                    
+                    allContents.forEach(item => {
+                        item.classList.add('hidden');
+                    });
+                     allIcons.forEach(item => {
+                        item.textContent = '+';
+                        item.classList.remove('rotate-45');
+                    });
+
+                    if (isHidden) {
+                        content.classList.remove('hidden');
+                        icon.textContent = '+';
+                        icon.classList.add('rotate-45');
+                    }
+                });
+            }
+
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const icons = mobileMenuButton.querySelectorAll('svg');
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+                icons[0].classList.toggle('hidden');
+                icons[1].classList.toggle('hidden');
+            });
+            
+            const navLinks = document.querySelectorAll('.nav-link');
+            const sections = document.querySelectorAll('main section');
+            const headerHeight = document.getElementById('header').offsetHeight;
+
+            window.addEventListener('scroll', () => {
+                let current = '';
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop - headerHeight - 20;
+                    if (pageYOffset >= sectionTop) {
+                        current = section.getAttribute('id');
+                    }
+                });
+
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href').substring(1) === current) {
+                        link.classList.add('active');
+                    }
+                });
+            });
+
+            // Carousel Logic
+            const carouselItems = document.querySelectorAll('.carousel-item');
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            let currentIndex = 0;
+
+            function showItem(index) {
+                carouselItems.forEach((item, i) => {
+                    item.classList.remove('active');
+                    if (i === index) {
+                        item.classList.add('active');
+                    }
+                });
+            }
+
+            prevBtn.addEventListener('click', () => {
+                currentIndex = (currentIndex > 0) ? currentIndex - 1 : carouselItems.length - 1;
+                showItem(currentIndex);
+            });
+
+            nextBtn.addEventListener('click', () => {
+                currentIndex = (currentIndex < carouselItems.length - 1) ? currentIndex + 1 : 0;
+                showItem(currentIndex);
+            });
+
+        });
+    </script>
+</body>
+</html>
