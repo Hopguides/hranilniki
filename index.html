@@ -59,6 +59,18 @@
         .carousel-item.active {
             display: grid;
         }
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #10b981;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800">
@@ -236,32 +248,40 @@
             </div>
         </section>
 
-        <section id="knjiga" class="py-16 lg:py-24 bg-emerald-50">
+        <section id="knjiga" class="py-16 lg:py-24 bg-white">
             <div class="container mx-auto px-4 lg:px-6">
                 <div class="grid lg:grid-cols-2 gap-12 items-center">
                     <div class="text-center">
-                        <img src="images/image1.jpg" alt="Vodnik po Hranilnikih" class="rounded-lg shadow-2xl mx-auto transform hover:scale-105 transition-transform duration-300" onerror="this.onerror=null;this.src='https://placehold.co/800x600/e2e8f0/64748b?text=Vodnik+po+Hranilnikih';">
+                        <img src="images/image6.jpg" alt="Naslovnica priročnika o baterijskih hranilnikih" class="rounded-lg shadow-2xl mx-auto transform hover:scale-105 transition-transform duration-300 max-w-sm" onerror="this.onerror=null;this.src='https://placehold.co/600x800/e2e8f0/64748b?text=Vodnik+po+Hranilnikih';">
                     </div>
                     <div class="text-left">
-                        <h2 class="text-3xl font-bold text-slate-900 mb-4">Vaš Celovit Priročnik do Energetske Neodvisnosti</h2>
-                        <p class="text-lg text-slate-600 mb-6">
-                            Nova omrežnina, konec neto merjenja in nestanovitne cene energije odpirajo nova vprašanja. Ta priročnik ni le teorija – je vaš praktični vodnik, ki vam pokaže, kako z baterijskim hranilnikom ne le preživeti, ampak zmagati v novi energetski realnosti. Odkrijte, kako zmanjšati stroške, povečati varnost in spremeniti vašo sončno elektrarno v zares donosno naložbo.
-                        </p>
-                        <div id="form-container" class="mt-8 p-6 bg-white rounded-lg shadow-md border">
-                            <h3 class="font-semibold text-lg mb-4">Prenesite brezplačen priročnik zdaj!</h3>
+                        <h2 class="text-3xl font-bold text-slate-900 mb-4">Spremenite svojo elektrarno v zares izjemno naložbo</h2>
+                        <div class="space-y-4 text-slate-700 leading-relaxed">
+                             <p>Čestitamo! Če ste lastnik sončne elektrarne, ste že naredili pomemben korak. A ste se kdaj vprašali, ali bi lahko izkoristili potencial sonca še bolje?</p>
+                            <p>Nova metodologija obračunavanja omrežnine, nestabilna proizvodnja in problem neizkoriščenih viškov so izzivi, s katerimi se soočate vsak dan. Vaša sončna elektrarna sredi dneva proizvede več energije, kot jo potrebujete, ta dragoceni presežek pa se odda v omrežje po nizkih cenah. Zvečer, ko energijo najbolj potrebujete, pa jo morate kupovati po visokih cenah. To ni optimalno.</p>
+                            <p>Ta priročnik je namenjen prav vam – lastnikom sončnih elektrarn, ki želite izvedeti, kako lahko baterijski hranilnik (BESS) bistveno poveča vrednost vaše naložbe. Raziskali bomo, kako lahko s pametnim shranjevanjem presežkov:</p>
+                            <ul class="list-disc list-outside pl-5 space-y-2">
+                                <li><span class="font-semibold">Še dodatno zmanjšate mesečne stroške.</span></li>
+                                <li><span class="font-semibold">Se prilagodite zahtevni novi metodologiji obračunavanja.</span></li>
+                                <li><span class="font-semibold">Povečate svojo neodvisnost in postanete gospodar svoje energije.</span></li>
+                            </ul>
+                            <p>Pripravite se na odkritje, kako lahko vaša odlična naložba postane zares izjemna!</p>
+                        </div>
+                        
+                        <form id="contact-form" action="https://formspree.io/f/xxxxxxxx" method="POST" class="mt-8 p-6 bg-slate-50 rounded-lg shadow-md border">
+                            <h3 class="font-semibold text-lg mb-4">Vnesite svoj e-mail in odklenite priročnik!</h3>
                             <div class="space-y-4">
-                                <input id="email-input" type="email" placeholder="Vnesite vaš e-mail naslov" class="w-full px-4 py-2 border border-slate-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500">
-                                <button id="download-btn" class="w-full bg-emerald-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-emerald-700 transition-colors">
-                                    PRENESI PRIROČNIK
+                                <input name="email" id="email-input" type="email" placeholder="vas@email.si" class="w-full px-4 py-2 border border-slate-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500" required>
+                                <input type="hidden" name="vrsta_povprasevanja" id="request-type" value="">
+                                <button type="submit" id="download-btn" class="w-full bg-emerald-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-emerald-700 transition-colors">
+                                    PRENESI BREZPLAČEN PRIROČNIK
                                 </button>
                                 <div class="text-center text-slate-500 my-2">ali</div>
-                                <button id="meeting-btn" class="w-full bg-slate-200 text-slate-800 font-semibold py-3 px-6 rounded-lg hover:bg-slate-300 transition-colors">
-                                    ŽELIM SESTANEK
+                                <button type="submit" id="meeting-btn" class="w-full bg-slate-200 text-slate-800 font-semibold py-3 px-6 rounded-lg hover:bg-slate-300 transition-colors">
+                                    ŽELIM NEODVEZUJOČ SESTANEK
                                 </button>
                             </div>
-                        </div>
-                        <div id="success-message" class="hidden mt-6 p-4 bg-green-100 text-green-800 rounded-lg text-center">
-                        </div>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -370,6 +390,15 @@
                             <p class="text-sm text-emerald-800">Okvirna vračilna doba naložbe:</p>
                             <p class="text-3xl font-bold text-emerald-700 mt-1"><span id="payback-period">3.3</span> let</p>
                         </div>
+
+                        <div class="mt-6">
+                            <button id="gemini-analysis-btn" class="w-full bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center">
+                                <span class="mr-2">✨</span> Ustvari osebno analizo
+                            </button>
+                            <div id="gemini-loader" class="hidden mx-auto mt-4 loader"></div>
+                            <div id="gemini-result" class="hidden mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg text-sm text-slate-700 prose max-w-none"></div>
+                        </div>
+
                     </div>
                 </div>
             </div>
@@ -734,44 +763,88 @@
             // Form Logic
             const downloadBtn = document.getElementById('download-btn');
             const meetingBtn = document.getElementById('meeting-btn');
-            const emailInput = document.getElementById('email-input');
-            const successMessageEl = document.getElementById('success-message');
-            const formContainer = document.getElementById('form-container');
-
-            function showSuccessMessage(message) {
-                successMessageEl.innerHTML = message;
-                successMessageEl.classList.remove('hidden');
-                formContainer.classList.add('hidden');
-                setTimeout(() => {
-                    successMessageEl.classList.add('hidden');
-                    formContainer.classList.remove('hidden');
-                    emailInput.value = '';
-                }, 5000);
+            const requestTypeInput = document.getElementById('request-type');
+            
+            if (downloadBtn) {
+                downloadBtn.addEventListener('click', () => {
+                    requestTypeInput.value = 'Prenos priročnika';
+                });
             }
 
-            function validateEmail(email) {
-                const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-                return re.test(String(email).toLowerCase());
+            if (meetingBtn) {
+                meetingBtn.addEventListener('click', () => {
+                    requestTypeInput.value = 'Želja po sestanku';
+                });
             }
+            
+            // Gemini API Logic
+            const geminiBtn = document.getElementById('gemini-analysis-btn');
+            const geminiLoader = document.getElementById('gemini-loader');
+            const geminiResult = document.getElementById('gemini-result');
 
-            downloadBtn.addEventListener('click', () => {
-                const email = emailInput.value;
-                if (validateEmail(email)) {
-                    showSuccessMessage('Hvala! Priročnik je bil poslan na vaš e-mail. Preverite svojo pošto.');
-                } else {
-                    emailInput.style.borderColor = 'red';
-                    emailInput.placeholder = 'Vnesite veljaven e-mail naslov';
+            geminiBtn.addEventListener('click', async () => {
+                geminiLoader.classList.remove('hidden');
+                geminiResult.classList.add('hidden');
+                geminiResult.innerHTML = '';
+                
+                const capacity = document.getElementById('capacity-value').innerText;
+                const netInvestment = document.getElementById('net-investment').innerText;
+                const paybackPeriod = document.getElementById('payback-period').innerText;
+
+                const prompt = `
+                    You are an expert energy consultant in Slovenia. A potential customer has used an online calculator to estimate an investment in a battery energy storage system (BESS). Their inputs are: 
+                    - Capacity: ${capacity}
+                    - Net Investment (after subsidy): ${netInvestment}
+                    - Payback Period: ${paybackPeriod} years.
+
+                    Based on this data, provide a short, encouraging analysis in Slovenian. The analysis should be structured in three parts with Markdown formatting: 
+                    1.  **Ključne Prednosti:** Briefly mention why this size of investment is beneficial.
+                    2.  **Pomembna Dejstva:** Gently point out one or two things to keep in mind.
+                    3.  **Naslednji Koraki:** Suggest two concrete next steps.
+                    
+                    The entire response must be in Slovenian. Use a professional, positive, and helpful tone. Do not repeat the input values in your response.
+                `;
+
+                try {
+                    let chatHistory = [{ role: "user", parts: [{ text: prompt }] }];
+                    const payload = { contents: chatHistory };
+                    const apiKey = "";
+                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+                    
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.candidates && result.candidates.length > 0 &&
+                        result.candidates[0].content && result.candidates[0].content.parts &&
+                        result.candidates[0].content.parts.length > 0) {
+                        
+                        let text = result.candidates[0].content.parts[0].text;
+                        
+                        // Basic Markdown to HTML conversion
+                        text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                        text = text.replace(/\n\s*-\s/g, '</li><li>');
+                        text = text.replace(/\n/g, '<br>');
+                        text = '<ul><li>' + text.substring(text.indexOf('</li><li>')+5);
+                        text = text.replace(/<br><ul>/g, '<ul>');
+                        text += '</li></ul>'
+                        
+                        geminiResult.innerHTML = text;
+                    } else {
+                        geminiResult.innerText = 'Prišlo je do napake pri generiranju analize. Prosimo, poskusite znova.';
+                    }
+                } catch (error) {
+                    console.error("Error calling Gemini API:", error);
+                    geminiResult.innerText = 'Prišlo je do napake pri komunikaciji s strežnikom. Preverite internetno povezavo.';
+                } finally {
+                    geminiLoader.classList.add('hidden');
+                    geminiResult.classList.remove('hidden');
                 }
             });
-
-            meetingBtn.addEventListener('click', () => {
-                showSuccessMessage('Hvala za vaše zanimanje! Kmalu vas bomo kontaktirali za uskladitev termina sestanka.');
-            });
-
-            emailInput.addEventListener('input', () => {
-                emailInput.style.borderColor = '';
-            });
-
         });
     </script>
 </body>
